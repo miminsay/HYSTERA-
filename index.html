@@ -6,15 +6,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-*{
-  box-sizing: border-box;
-  font-family: monospace;
-}
+*{ box-sizing:border-box; font-family:monospace; }
 
 body{
   margin:0;
-  background:black;
-  color:white;
+  background:#000;
+  color:#fff;
   height:100vh;
   display:flex;
   flex-direction:column;
@@ -23,7 +20,8 @@ body{
 header{
   padding:16px;
   text-align:center;
-  font-size:1.6rem;
+  font-size:1.7rem;
+  letter-spacing:3px;
   border-bottom:1px solid #222;
 }
 
@@ -58,7 +56,7 @@ header{
 
 .system{
   align-self:center;
-  font-size:0.9rem;
+  font-size:.9rem;
   color:#666;
 }
 
@@ -75,7 +73,7 @@ input{
   font-size:1.1rem;
   background:#0a0a0a;
   border:1px solid #333;
-  color:white;
+  color:#fff;
   border-radius:10px;
   outline:none;
 }
@@ -85,14 +83,12 @@ button{
   font-size:1.1rem;
   background:#8b0000;
   border:none;
-  color:white;
+  color:#fff;
   border-radius:10px;
   cursor:pointer;
 }
 
-button:hover{
-  background:#b00000;
-}
+button:hover{ background:#b00000; }
 </style>
 </head>
 
@@ -111,80 +107,112 @@ button:hover{
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
 
+let ultimaResposta = "";
+
 const personagens = [
-  { nome: "Seulgi", vibe: "depressao" },
-  { nome: "Yeri", vibe: "paranoia" },
-  { nome: "Joy", vibe: "mania" },
-  { nome: "Irene", vibe: "obsessao" }
+  { nome:"Seulgi", vibe:"depressao" },
+  { nome:"Joy", vibe:"mania" },
+  { nome:"Yeri", vibe:"paranoia" },
+  { nome:"Irene", vibe:"obsessao" }
 ];
 
 const girias = [
-  "mano", "véi", "mds", "real", "juro",
-  "KKKKKK", "????", "rindo de nervoso", "socorro"
+  "mano","véi","mds","real","juro",
+  "KKKK","????","rindo de nervoso","socorro"
 ];
 
-const reacoes = {
-  depressao: [
-    "isso pesa, não vou mentir.",
-    "cansa até explicar.",
+const falasBase = {
+  depressao:[
+    "isso pesa real.",
+    "cansa até existir.",
     "não é drama não.",
-    "fica aí, fala mais."
+    "tô aqui ouvindo."
   ],
-  paranoia: [
-    "tu falou isso alto demais.",
-    "tem alguém ouvindo.",
-    "isso não parece coincidência.",
-    "isso vai dar ruim, eu sinto."
-  ],
-  mania: [
+  mania:[
     "KKKK eu ri foi mal.",
-    "isso deu uma ideia agora.",
-    "tô acelerada demais.",
-    "me conta mais, rápido."
+    "isso deu um gás estranho.",
+    "minha cabeça acelerou.",
+    "fala mais, rápido."
   ],
-  obsessao: [
-    "volta nisso, tem detalhe faltando.",
-    "isso não tá bem explicado.",
-    "organiza melhor esse pensamento.",
-    "repete isso direito."
+  paranoia:[
+    "isso não parece coincidência.",
+    "tem algo estranho aí.",
+    "fica atento.",
+    "não ignora isso."
+  ],
+  obsessao:[
+    "volta nisso.",
+    "tem detalhe faltando.",
+    "organiza melhor.",
+    "isso não fechou."
   ]
+};
+
+const gatilhos = {
+  medo:"quando tu fala medo, teu corpo já tá em alerta.",
+  cansado:"isso soa como exaustão de verdade.",
+  sozinho:"ficar sozinho aqui nunca é só ficar sozinho.",
+  ouvir:"tu ouviu isso mesmo… ou só pareceu?",
+  ver:"nem tudo que a gente vê é confiável."
 };
 
 function rand(arr){
   return arr[Math.floor(Math.random()*arr.length)];
 }
 
-function addMessage(text, type){
-  const div = document.createElement("div");
-  div.className = "msg " + type;
-  div.innerText = text;
+function addMessage(text,type){
+  const div=document.createElement("div");
+  div.className="msg "+type;
+  div.innerText=text;
   chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
+  chat.scrollTop=chat.scrollHeight;
 }
 
-function gerarResposta(p, userText){
-  const inicio = rand(girias);
-  const meio = rand(reacoes[p.vibe]);
+function extrairTrecho(text){
+  const palavras=text.split(" ");
+  if(palavras.length<=4) return text;
+  return palavras.slice(0,4).join(" ");
+}
 
-  let final = "";
-  if(userText.length < 4){
-    final = "fala direito, carai.";
-  } else if(userText.includes("?")){
-    final = "boa pergunta… ou não.";
-  } else {
-    final = "isso diz muita coisa.";
+function respostaContextual(p,userText){
+  const inicio = rand(girias);
+  const trecho = extrairTrecho(userText.toLowerCase());
+
+  // gatilhos diretos
+  for(let g in gatilhos){
+    if(userText.toLowerCase().includes(g)){
+      return `${inicio}… ${gatilhos[g]} (olhando pra você)`;
+    }
   }
 
-  return `${inicio}… ${meio} ${final}`;
+  // pergunta direta
+  if(userText.includes("?")){
+    return `${inicio}… quando tu pergunta "${trecho}…", o que tu espera ouvir?`;
+  }
+
+  // curta demais
+  if(userText.length < 4){
+    return `${inicio}… fala direito comigo.`;
+  }
+
+  // resposta base + eco
+  const base = rand(falasBase[p.vibe]);
+  return `${inicio}… tu disse "${trecho}…" — ${base}`;
 }
 
 function botReply(userText){
   const p = rand(personagens);
-  const resposta = gerarResposta(p, userText);
+  let resposta;
+
+  do{
+    resposta = respostaContextual(p,userText);
+  }while(resposta === ultimaResposta);
+
+  ultimaResposta = resposta;
 
   setTimeout(()=>{
     addMessage(`${p.nome}: ${resposta}`, "bot");
-  }, 400 + Math.random()*600);
+  },400 + Math.random()*600);
 }
 
 function sendMessage(){
@@ -192,17 +220,17 @@ function sendMessage(){
   if(!text) return;
 
   addMessage("Você: " + text, "user");
-  input.value = "";
+  input.value="";
   botReply(text);
 }
 
-input.addEventListener("keydown", e=>{
-  if(e.key === "Enter") sendMessage();
+input.addEventListener("keydown",e=>{
+  if(e.key==="Enter") sendMessage();
 });
 
 setTimeout(()=>{
-  addMessage("Sistema: paciente conectado. ninguém aqui tá normal.", "system");
-}, 600);
+  addMessage("Sistema: paciente conectado. a clínica nunca foi um lugar.", "system");
+},600);
 </script>
 
 </body>
