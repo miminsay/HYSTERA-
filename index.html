@@ -2,200 +2,223 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>PSYCHO CHAT</title>
+<title>HYSTERA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 * {
   box-sizing: border-box;
-  font-family: 'Arial', sans-serif;
+  font-family: system-ui, sans-serif;
 }
 
 body {
   margin: 0;
   background: #000;
-  color: #eaeaea;
+  color: #eee;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
   height: 100vh;
 }
 
-#app {
-  width: 95%;
-  max-width: 900px;
-  height: 90vh;
-  background: #050505;
-  border: 1px solid #222;
-  display: flex;
-  flex-direction: column;
-}
-
 header {
-  padding: 15px;
+  padding: 18px;
   text-align: center;
-  background: #000;
+  font-size: 1.8rem;
   border-bottom: 1px solid #222;
   letter-spacing: 2px;
-  font-weight: bold;
 }
 
 #chat {
   flex: 1;
   padding: 20px;
   overflow-y: auto;
-  font-size: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .msg {
-  margin-bottom: 14px;
+  max-width: 85%;
+  padding: 16px 18px;
+  border-radius: 14px;
+  font-size: 1.15rem;
   line-height: 1.4;
 }
 
 .user {
-  color: #8bd3ff;
+  align-self: flex-end;
+  background: #1c1c1c;
+  border: 1px solid #333;
 }
 
 .bot {
-  color: #ff7b7b;
+  align-self: flex-start;
+  background: #0e0e0e;
+  border: 1px solid #2a2a2a;
 }
 
-.name {
-  font-weight: bold;
+.system {
+  align-self: center;
+  font-size: 0.95rem;
+  color: #666;
 }
 
 footer {
   display: flex;
+  gap: 10px;
+  padding: 16px;
   border-top: 1px solid #222;
 }
 
 input {
   flex: 1;
-  padding: 15px;
-  background: #000;
-  border: none;
+  padding: 16px;
+  font-size: 1.1rem;
+  background: #0d0d0d;
   color: #fff;
-  font-size: 18px;
+  border: 1px solid #333;
+  border-radius: 12px;
   outline: none;
 }
 
 button {
-  padding: 15px 25px;
-  background: #111;
-  border: none;
+  padding: 16px 22px;
+  font-size: 1.1rem;
+  background: #7a0000;
   color: #fff;
-  font-size: 18px;
+  border: none;
+  border-radius: 12px;
   cursor: pointer;
 }
-
 button:hover {
-  background: #222;
+  background: #a00000;
 }
 </style>
 </head>
 
 <body>
-<div id="app">
-  <header>PSYCHOLOGICAL CHAT ROOM</header>
 
-  <div id="chat"></div>
+<header>HYSTERA</header>
 
-  <footer>
-    <input id="input" placeholder="fala alguma coisa..." />
-    <button onclick="send()">Enviar</button>
-  </footer>
-</div>
+<div id="chat"></div>
+
+<footer>
+  <input id="input" placeholder="fala qualquer coisa..." />
+  <button onclick="sendMessage()">Enviar</button>
+</footer>
 
 <script>
-let memory = JSON.parse(localStorage.getItem("memory")) || [];
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
 
-const girls = {
-  Seulgi: {
-    mood: "depressão",
-    style: [
-      "às vezes tudo pesa né…",
-      "não tô triste, só cansada de existir",
-      "silêncio também grita",
-      "tem dias que eu sumo por dentro"
+const personagens = [
+  {
+    nome: "Seulgi",
+    vibe: "depressão",
+    respostas: [
+      "não sei… às vezes tudo soa meio pesado.",
+      "entendi. faz sentido do jeito triste das coisas.",
+      "isso bate diferente dependendo do dia.",
+      "não vou mentir, isso me cansou só de ouvir.",
+      "tem horas que nem responder eu queria."
     ]
   },
-  Joy: {
-    mood: "mania",
-    style: [
-      "KKKKKK EU AMO ISSO",
-      "tô elétrica demais pra dormir",
-      "pensamento indo a 300km/h",
-      "bora tocar o caos?"
+  {
+    nome: "Yeri",
+    vibe: "paranoia",
+    respostas: [
+      "ok, mas por que tu falou isso agora?",
+      "não sei se gostei dessa frase.",
+      "isso parece importante demais pra ser aleatório.",
+      "anota isso mentalmente… só por precaução.",
+      "não tô dizendo nada, só observando."
     ]
   },
-  Yeri: {
-    mood: "paranoia",
-    style: [
-      "tu percebeu isso também ou só eu?",
-      "isso parece normal demais pra ser real",
-      "tem algo errado aqui… sempre tem",
-      "não confio nesse silêncio"
+  {
+    nome: "Joy",
+    vibe: "mania",
+    respostas: [
+      "KKKKKKKK eu ri, foi mal.",
+      "isso foi inesperado, gostei.",
+      "mds do nada ISSO",
+      "energia caótica, adorei.",
+      "continua, isso tá ficando bom."
     ]
   },
-  Irene: {
-    mood: "obsessão",
-    style: [
-      "eu penso nisso o tempo todo",
-      "não consigo largar essa ideia",
-      "controle é conforto",
-      "se não for perfeito, não serve"
+  {
+    nome: "Irene",
+    vibe: "obsessão",
+    respostas: [
+      "ok. isso ficou na minha cabeça agora.",
+      "vou pensar nisso mais do que devia.",
+      "anotando mentalmente.",
+      "interessante… vou voltar nisso depois.",
+      "não devia importar tanto, mas importa."
     ]
   }
-};
-
-const memes = [
-  "isso aqui virou surto coletivo",
-  "floptok explicaria isso fácil",
-  "parece normal mas claramente não é",
-  "KKKKKKKK socorro",
-  "isso é muito eu infelizmente"
 ];
 
-function random(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-function addMsg(text, cls) {
-  const chat = document.getElementById("chat");
+function addMessage(text, type) {
   const div = document.createElement("div");
-  div.className = "msg " + cls;
-  div.innerHTML = text;
+  div.className = "msg " + type;
+  div.innerText = text;
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
 }
 
-function send() {
-  const input = document.getElementById("input");
+function escolherPersonagem() {
+  return personagens[Math.floor(Math.random() * personagens.length)];
+}
+
+function gerarResposta(personagem, userText) {
+  let base = personagem.respostas[
+    Math.floor(Math.random() * personagem.respostas.length)
+  ];
+
+  // respostas mais humanas baseadas no contexto
+  if (userText.length < 4) {
+    base += " fala mais, pô.";
+  } else if (userText.includes("?")) {
+    base += " boa pergunta.";
+  } else if (userText.toLowerCase().includes("odeio")) {
+    base += " dá pra sentir a raiva daí.";
+  } else if (userText.toLowerCase().includes("amo")) {
+    base += " isso foi fofo, infelizmente.";
+  }
+
+  return base;
+}
+
+function botReply(userText) {
+  const personagem = escolherPersonagem();
+  const resposta = gerarResposta(personagem, userText);
+
+  setTimeout(() => {
+    addMessage(`${personagem.nome}: ${resposta}`, "bot");
+  }, 500 + Math.random() * 700);
+}
+
+function sendMessage() {
   const text = input.value.trim();
   if (!text) return;
 
-  addMsg(`<span class="name">Você:</span> ${text}`, "user");
-
-  memory.push({ user: text });
-  localStorage.setItem("memory", JSON.stringify(memory));
-
+  addMessage(text, "user");
   input.value = "";
 
-  setTimeout(() => respond(text), 600);
+  botReply(text);
 }
 
-function respond(userText) {
-  Object.keys(girls).forEach(name => {
-    const g = girls[name];
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter") sendMessage();
+});
 
-    const response = [
-      random(g.style),
-      random(memes),
-      `sobre isso que tu falou: "${userText}"`
-    ].sort(() => Math.random() - 0.5).join(" ");
-
-    addMsg(`<span class="name">${name}:</span> ${response}`, "bot");
-  });
-}
+setTimeout(() => {
+  addMessage(
+    "Sistema: paciente conectado. conversa livre. ninguém é normal aqui.",
+    "system"
+  );
+}, 600);
 </script>
+
 </body>
   </html>
