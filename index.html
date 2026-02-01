@@ -7,17 +7,17 @@
 
 <style>
 * { box-sizing: border-box; font-family: system-ui, sans-serif; }
-body { margin: 0; background: #000; color: #eee; display: flex; flex-direction: column; height: 100vh; }
-header { padding: 20px; text-align: center; font-size: 2.2rem; letter-spacing: 3px; border-bottom: 1px solid #222; }
-#chat { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 18px; }
-.msg { max-width: 78%; padding: 18px 22px; border-radius: 18px; font-size: 1.3rem; line-height: 1.45; word-wrap: break-word; }
-.user { align-self: flex-end; background: #1e1e1e; border: 1px solid #333; }
-.bot { align-self: flex-start; background: #0f0f0f; border: 1px solid #2a2a2a; }
-.system { align-self: center; font-size: 1rem; color: #666; }
-footer { display: flex; gap: 12px; padding: 18px; border-top: 1px solid #222; background: #050505; }
-textarea { flex: 1; min-height: 70px; max-height: 160px; resize: vertical; padding: 18px; font-size: 1.3rem; background: #0d0d0d; color: #fff; border: 1px solid #333; border-radius: 14px; outline: none; }
-button { padding: 18px 26px; font-size: 1.2rem; background: #7a0000; color: #fff; border: none; border-radius: 14px; cursor: pointer; }
-button:hover { background: #a00000; }
+body { margin:0; background:#000; color:#eee; display:flex; flex-direction:column; height:100vh; }
+header { padding:20px; text-align:center; font-size:2.2rem; letter-spacing:3px; border-bottom:1px solid #222; }
+#chat { flex:1; padding:24px; overflow-y:auto; display:flex; flex-direction:column; gap:18px; }
+.msg { max-width:78%; padding:18px 22px; border-radius:18px; font-size:1.3rem; line-height:1.45; word-wrap:break-word; }
+.user { align-self:flex-end; background:#1e1e1e; border:1px solid #333; }
+.bot { align-self:flex-start; background:#0f0f0f; border:1px solid #2a2a2a; }
+.system { align-self:center; font-size:1rem; color:#666; }
+footer { display:flex; gap:12px; padding:18px; border-top:1px solid #222; background:#050505; }
+textarea { flex:1; min-height:70px; max-height:160px; resize:vertical; padding:18px; font-size:1.3rem; background:#0d0d0d; color:#fff; border:1px solid #333; border-radius:14px; outline:none; }
+button { padding:18px 26px; font-size:1.2rem; background:#7a0000; color:#fff; border:none; border-radius:14px; cursor:pointer; }
+button:hover { background:#a00000; }
 </style>
 </head>
 <body>
@@ -38,77 +38,82 @@ const input = document.getElementById("input");
 // memória infinita
 let memoria = [];
 
+// personagens com templates variados
 const personagens = [
-  { nome: "Seulgi", respostas: ["isso soou pesado… mas eu entendi.", "tem dias que tudo fica assim mesmo.", "não vou fingir que isso não dói.", "fala mais… se quiser."] },
-  { nome: "Yeri", respostas: ["por que tu falou isso agora?", "isso não parece coincidência.", "anota mentalmente… só por segurança.", "estranho. continua."] },
-  { nome: "Joy", respostas: ["KKKKKKKK eu ri, foi mal.", "energia caótica, adorei 😭", "isso foi muito do nada", "continua, isso tá bom"] },
-  { nome: "Irene", respostas: ["isso ficou preso na minha cabeça agora.", "vou pensar nisso mais do que devia.", "interessante. continua."] }
+  { nome:"Seulgi", vibe:"depressão", base:["isso pesa… sério 😢","às vezes eu só quero sumir","eu sei como cansa","mano… é foda mesmo","isso me deixa quieta…"] },
+  { nome:"Yeri", vibe:"paranoia", base:["espera… isso é estranho 😳","não parece coincidência","alguém tá ouvindo, certeza","isso vai dar ruim…","tô sentindo algo errado"] },
+  { nome:"Joy", vibe:"mania", base:["KKKKKKK eu ri, foi mal 🤡","energia caótica demais kkk","isso foi inesperado","continua, gostei demais","mds, adorei o caos"] },
+  { nome:"Irene", vibe:"obsessão", base:["isso ficou preso na minha cabeça","vou pensar nisso mais do que devia 😬","interessante… continuo analisando","não devia importar mas importa","ahhh mano, não consigo parar de pensar nisso"] }
 ];
 
-// função pra escolher personagem aleatório
-function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+// gírias, emojis, memes para misturar
+const extras = ["mano","véi","mds","slc","KKKK","😂","😭","😳","😈","socorro","real","juro","aff","🤡","fofo demais"];
 
-// função pra adicionar mensagem
-function addMessage(text, type) {
-  const div = document.createElement("div");
-  div.className = "msg " + type;
-  div.innerText = text;
+// função auxiliar
+function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+// adiciona mensagem no chat
+function addMessage(text,type){
+  const div=document.createElement("div");
+  div.className="msg "+type;
+  div.innerText=text;
   chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
+  chat.scrollTop=chat.scrollHeight;
 }
 
-// função que gera resposta usando a memória
-function gerarResposta(personagem, userText) {
-  memoria.push(userText); // salva o que jogador falou
-  let resposta = rand(personagem.respostas);
+// gera resposta humana e imprevisível usando memória
+function gerarResposta(personagem, userText){
+  memoria.push(userText);
 
-  // respostas adaptativas baseadas na memória
-  if(memoria.length > 3){
-    const last = memoria[memoria.length-2];
-    resposta += " tu disse antes: '" + last + "', né?";
+  // escolhe uma base aleatória do personagem
+  let resposta = rand(personagem.base);
+
+  // mistura extras aleatórios
+  if(Math.random()>0.5) resposta += " " + rand(extras);
+
+  // faz referência indireta à memória sem repetir literal
+  if(memoria.length>2){
+    let contexto = memoria[memoria.length-2];
+    let palavras = contexto.split(" ").filter(w=>w.length>2);
+    if(palavras.length>0){
+      let p = rand(palavras);
+      resposta += " …isso me lembra de '" + p + "' 😳";
+    }
   }
 
+  // respostas adaptativas
   if(userText.includes("?")) resposta += " o que tu acha disso?";
-  if(userText.length < 4) resposta += " fala direito pô 😭";
-  if(userText.toLowerCase().includes("amo")) resposta += " isso foi fofo demais.";
-  if(userText.toLowerCase().includes("odeio")) resposta += " deu pra sentir o ódio daqui.";
+  if(userText.length<4) resposta += " fala mais aí 😭";
+  if(userText.toLowerCase().includes("amo")) resposta += " isso foi fofo demais 😈";
+  if(userText.toLowerCase().includes("odeio")) resposta += " deu pra sentir o ódio kkk";
 
   return resposta;
 }
 
-// resposta do bot
-function botReply(userText) {
+// envia resposta do bot
+function botReply(userText){
   const personagem = rand(personagens);
-  const resposta = gerarResposta(personagem, userText);
-
-  setTimeout(() => {
-    addMessage(`${personagem.nome}: ${resposta}`, "bot");
-  }, 500 + Math.random() * 700);
+  const resposta = gerarResposta(personagem,userText);
+  setTimeout(()=>{ addMessage(`${personagem.nome}: ${resposta}`,"bot"); },500+Math.random()*700);
 }
 
-// envio da mensagem
-function sendMessage() {
-  const text = input.value.trim();
+// envia mensagem do usuário
+function sendMessage(){
+  const text=input.value.trim();
   if(!text) return;
-
-  addMessage(text, "user");
-  input.value = "";
-
+  addMessage(text,"user");
+  input.value="";
   botReply(text);
 }
 
 // enter pra enviar
-input.addEventListener("keydown", e => {
-  if(e.key === "Enter" && !e.shiftKey){
-    e.preventDefault();
-    sendMessage();
-  }
+input.addEventListener("keydown",e=>{
+  if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); sendMessage(); }
 });
 
 // mensagem inicial
-setTimeout(() => {
-  addMessage("Sistema: paciente conectado. memória ativa. ninguém aqui tá são 🖤", "system");
-}, 600);
+setTimeout(()=>{ addMessage("Sistema: paciente conectado. memória infinita ativada. ninguém aqui tá são 🖤","system"); },600);
+
 </script>
 
 </body>
