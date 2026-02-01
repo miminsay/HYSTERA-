@@ -1,109 +1,64 @@
 <script>
-const chat = document.getElementById("chat");
-const input = document.getElementById("input");
+  const chat = document.getElementById("chat");
+  const input = document.getElementById("input");
 
-const personagens = [
-  {
-    nome: "Seulgi",
-    peso: "baixo",
-    falas: [
-      "eu entendi o que tu quis dizer",
-      "isso soa cansativo… de um jeito real",
-      "não precisa fingir força aqui",
-      "fala comigo, eu acompanho teu ritmo",
-      "isso ficou pesado, mas eu tô aqui"
-    ]
-  },
-  {
-    nome: "Joy",
-    peso: "medio",
-    falas: [
-      "KKKK eu ri mas foi de nervoso",
-      "amg isso doeu um pouquinho",
-      "ok… isso ficou sério rápido",
-      "tem coisa que a gente brinca pra não quebrar",
-      "não vou zoar isso não, pode continuar"
-    ]
-  },
-  {
-    nome: "Irene",
-    peso: "alto",
-    falas: [
-      "faz sentido o que tu disse",
-      "vamos por partes, sem atropelar",
-      "isso não é exagero, é atenção",
-      "continua, não corta agora",
-      "tô acompanhando cada detalhe"
-    ]
-  },
-  {
-    nome: "Yeri",
-    peso: "medio",
-    falas: [
-      "ok… me explica melhor isso",
-      "tem algo aí que chama atenção",
-      "isso te deixou desconfortável depois?",
-      "não parece aleatório",
-      "continua, quero entender"
-    ]
-  }
-];
+  const personagens = [
+    {
+      nome: "Seulgi",
+      respostas: [
+        "mano… tu também sente que tá todo mundo te olhando? KLKKKK",
+        "eu juro que ouvi alguém sussurrando agora, mas deve ser coisa da minha cabeça… eu acho.",
+        "fica tranquilo… ou não fica, sei lá, ninguém fica normal aqui.",
+        "tu fala e eu tento focar, mas minha mente já foi pra outro canto faz tempo.",
+        "às vezes eu paro do nada pq tenho certeza que alguém tá atrás de mim."
+      ]
+    },
+    {
+      nome: "Joy",
+      respostas: [
+        "KKKKKKK eu rio mas é de nervoso tá?",
+        "ninguém aqui é 100% são, isso já ajuda a se sentir menos estranho.",
+        "tu parece menos quebrado do que a maioria daqui, parabéns eu acho?",
+        "me conta mais, fofoca terapêutica é válida.",
+        "se a gente surtar junto fica menos pesado, pensa assim."
+      ]
+    }
+  ];
 
-function addMessage(text, className){
-  const div = document.createElement("div");
-  div.className = "msg " + className;
-  div.innerText = text;
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
-}
-
-function analisarTom(text){
-  if(text.match(/kkk|lol|mds|aff/i)) return "leve";
-  if(text.length > 80) return "pesado";
-  if(text.includes("?")) return "reflexivo";
-  return "neutro";
-}
-
-function botReply(userText){
-  const tom = analisarTom(userText);
-
-  let filtrados = personagens;
-
-  if(tom === "pesado"){
-    filtrados = personagens.filter(p => p.nome !== "Joy");
+  function addMessage(text, className) {
+    const div = document.createElement("div");
+    div.className = "msg " + className;
+    div.innerText = text;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
   }
 
-  const p = filtrados[Math.floor(Math.random() * filtrados.length)];
-  let resposta = p.falas[Math.floor(Math.random() * p.falas.length)];
+  function botReply() {
+    const personagem = personagens[Math.floor(Math.random() * personagens.length)];
+    const resposta = personagem.respostas[
+      Math.floor(Math.random() * personagem.respostas.length)
+    ];
 
-  if(tom === "reflexivo"){
-    resposta += " — o que isso significa pra você?";
+    setTimeout(() => {
+      addMessage(`${personagem.nome}: ${resposta}`, "bot");
+    }, 600);
   }
 
-  if(tom === "leve" && p.nome === "Joy"){
-    resposta += " kkkkk";
+  function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+
+    addMessage(text, "user");
+    input.value = "";
+
+    botReply();
   }
 
-  setTimeout(()=>{
-    addMessage(`${p.nome}: ${resposta}`, "bot");
-  }, 600 + Math.random()*600);
-}
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") sendMessage();
+  });
 
-function sendMessage(){
-  const text = input.value.trim();
-  if(!text) return;
-
-  addMessage("Você: " + text, "user");
-  input.value = "";
-
-  botReply(text);
-}
-
-input.addEventListener("keydown", e=>{
-  if(e.key === "Enter") sendMessage();
-});
-
-setTimeout(()=>{
-  addMessage("Sistema: sessão iniciada. você não será ignorado.", "system");
-}, 700);
-  </script>
+  setTimeout(() => {
+    addMessage("Sistema: paciente conectado… boa sorte lidando com isso.", "bot");
+  }, 500);
+                                        </script>
