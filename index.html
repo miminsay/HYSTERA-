@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>HYSTERA</title>
+<title>HYSTERA 2.0</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -22,7 +22,7 @@ button:hover { background:#a00000; }
 </head>
 <body>
 
-<header>HYSTERA</header>
+<header>HYSTERA 2.0</header>
 
 <div id="chat"></div>
 
@@ -38,21 +38,62 @@ const input = document.getElementById("input");
 // memória infinita
 let memoria = [];
 
-// personagens com templates variados
+// personagens
 const personagens = [
-  { nome:"Seulgi", vibe:"depressão", base:["isso pesa… sério 😢","às vezes eu só quero sumir","eu sei como cansa","mano… é foda mesmo","isso me deixa quieta…"] },
-  { nome:"Yeri", vibe:"paranoia", base:["espera… isso é estranho 😳","não parece coincidência","alguém tá ouvindo, certeza","isso vai dar ruim…","tô sentindo algo errado"] },
-  { nome:"Joy", vibe:"mania", base:["KKKKKKK eu ri, foi mal 🤡","energia caótica demais kkk","isso foi inesperado","continua, gostei demais","mds, adorei o caos"] },
-  { nome:"Irene", vibe:"obsessão", base:["isso ficou preso na minha cabeça","vou pensar nisso mais do que devia 😬","interessante… continuo analisando","não devia importar mas importa","ahhh mano, não consigo parar de pensar nisso"] }
+  { nome:"Seulgi", vibe:"depressão" },
+  { nome:"Yeri", vibe:"paranoia" },
+  { nome:"Joy", vibe:"mania" },
+  { nome:"Irene", vibe:"obsessão" }
 ];
 
-// gírias, emojis, memes para misturar
+// gírias, emojis e memes
 const extras = ["mano","véi","mds","slc","KKKK","😂","😭","😳","😈","socorro","real","juro","aff","🤡","fofo demais"];
 
-// função auxiliar
+// cria frases humanas sem repetir literal
+function gerarResposta(personagem, userText){
+  memoria.push(userText);
+
+  let frase = "";
+
+  // começar com gíria ou emoji aleatório
+  if(Math.random()>0.4) frase += rand(extras)+"… ";
+
+  // gerar frase baseada na vibe
+  switch(personagem.vibe){
+    case "depressão":
+      frase += ["mano… isso pesa","isso bate diferente dependendo do dia","não sei, tudo parece cinza","aff… me identifiquei","tô quieta só ouvindo"].map(rand)[0];
+      break;
+    case "paranoia":
+      frase += ["espera… isso é estranho","tem alguém olhando","isso não parece coincidência","anota mentalmente… só por precaução","tô sentindo algo errado"].map(rand)[0];
+      break;
+    case "mania":
+      frase += ["KKKKKK eu ri","energia caótica demais kkk","isso foi inesperado","continua, gostei demais","mds, adorei o caos"].map(rand)[0];
+      break;
+    case "obsessão":
+      frase += ["isso ficou preso na minha cabeça","vou pensar nisso mais do que devia","interessante… continuo analisando","não devia importar mas importa","ahhh mano, não consigo parar de pensar nisso"].map(rand)[0];
+      break;
+  }
+
+  // referência à memória anterior sem repetir literal
+  if(memoria.length>2){
+    let context = memoria.slice(-3,-1).join(" ");
+    let palavras = context.split(" ").filter(w=>w.length>2);
+    if(palavras.length>0 && Math.random()>0.5){
+      frase += " …isso me lembra de '"+rand(palavras)+"' 😳";
+    }
+  }
+
+  // respostas adaptativas
+  if(userText.includes("?")) frase += " o que tu acha disso?";
+  if(userText.length<4) frase += " fala mais aí 😭";
+  if(userText.toLowerCase().includes("amo")) frase += " isso foi fofo demais 😈";
+  if(userText.toLowerCase().includes("odeio")) frase += " deu pra sentir o ódio kkk";
+
+  return frase;
+}
+
 function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
-// adiciona mensagem no chat
 function addMessage(text,type){
   const div=document.createElement("div");
   div.className="msg "+type;
@@ -61,43 +102,12 @@ function addMessage(text,type){
   chat.scrollTop=chat.scrollHeight;
 }
 
-// gera resposta humana e imprevisível usando memória
-function gerarResposta(personagem, userText){
-  memoria.push(userText);
-
-  // escolhe uma base aleatória do personagem
-  let resposta = rand(personagem.base);
-
-  // mistura extras aleatórios
-  if(Math.random()>0.5) resposta += " " + rand(extras);
-
-  // faz referência indireta à memória sem repetir literal
-  if(memoria.length>2){
-    let contexto = memoria[memoria.length-2];
-    let palavras = contexto.split(" ").filter(w=>w.length>2);
-    if(palavras.length>0){
-      let p = rand(palavras);
-      resposta += " …isso me lembra de '" + p + "' 😳";
-    }
-  }
-
-  // respostas adaptativas
-  if(userText.includes("?")) resposta += " o que tu acha disso?";
-  if(userText.length<4) resposta += " fala mais aí 😭";
-  if(userText.toLowerCase().includes("amo")) resposta += " isso foi fofo demais 😈";
-  if(userText.toLowerCase().includes("odeio")) resposta += " deu pra sentir o ódio kkk";
-
-  return resposta;
-}
-
-// envia resposta do bot
 function botReply(userText){
-  const personagem = rand(personagens);
-  const resposta = gerarResposta(personagem,userText);
+  const personagem=rand(personagens);
+  const resposta=gerarResposta(personagem,userText);
   setTimeout(()=>{ addMessage(`${personagem.nome}: ${resposta}`,"bot"); },500+Math.random()*700);
 }
 
-// envia mensagem do usuário
 function sendMessage(){
   const text=input.value.trim();
   if(!text) return;
@@ -106,13 +116,12 @@ function sendMessage(){
   botReply(text);
 }
 
-// enter pra enviar
 input.addEventListener("keydown",e=>{
   if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); sendMessage(); }
 });
 
 // mensagem inicial
-setTimeout(()=>{ addMessage("Sistema: paciente conectado. memória infinita ativada. ninguém aqui tá são 🖤","system"); },600);
+setTimeout(()=>{ addMessage("Sistema: paciente conectado. memória infinita ativada. conversa livre. ninguém aqui tá 100% são 🖤","system"); },600);
 
 </script>
 
