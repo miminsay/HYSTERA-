@@ -9,13 +9,13 @@
   body { margin:0; background:#000; color:#eee; display:flex; flex-direction:column; height:100vh; }
   header { padding:18px; text-align:center; font-size:2rem; border-bottom:1px solid #222; letter-spacing:2px; }
   #chat { flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; }
-  .msg { max-width:80%; padding:14px 18px; border-radius:16px; font-size:1.2rem; line-height:1.4; word-wrap:break-word; }
+  .msg { max-width:80%; padding:16px 18px; border-radius:16px; font-size:1.3rem; line-height:1.5; word-wrap:break-word; }
   .user { align-self:flex-end; background:#1c1c1c; border:1px solid #333; }
   .bot { align-self:flex-start; background:#0e0e0e; border:1px solid #2a2a2a; }
-  .system { align-self:center; font-size:1rem; color:#666; }
+  .system { align-self:center; font-size:1.1rem; color:#666; }
   footer { display:flex; gap:10px; padding:16px; border-top:1px solid #222; }
-  input { flex:1; padding:16px; font-size:1.2rem; background:#0d0d0d; color:#fff; border:1px solid #333; border-radius:12px; outline:none; }
-  button { padding:16px 22px; font-size:1.2rem; background:#7a0000; color:#fff; border:none; border-radius:12px; cursor:pointer; }
+  input { flex:1; padding:18px; font-size:1.3rem; background:#0d0d0d; color:#fff; border:1px solid #333; border-radius:12px; outline:none; }
+  button { padding:18px 24px; font-size:1.3rem; background:#7a0000; color:#fff; border:none; border-radius:12px; cursor:pointer; }
   button:hover { background:#a00000; }
 </style>
 </head>
@@ -33,19 +33,19 @@
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
 
-// Divas
+// Divas com personalidade e contexto
 const personagens = [
-  { nome: "Seulgi", vibe:"depressão", memoria:[] },
-  { nome: "Yeri", vibe:"paranoia", memoria:[] },
-  { nome: "Joy", vibe:"mania", memoria:[] },
-  { nome: "Irene", vibe:"obsessão", memoria:[] }
+  { nome: "Seulgi", vibe:"depressão", contexto:[] },
+  { nome: "Yeri", vibe:"paranoia", contexto:[] },
+  { nome: "Joy", vibe:"mania", contexto:[] },
+  { nome: "Irene", vibe:"obsessão", contexto:[] }
 ];
 
-// Emojis e gírias
+// Emojis, gírias e memes
 const gírias = ["mano","véi","mds","slc","real","juro","kkk","😭","🤡","😳","😈","😱"];
-const memes = ["isso é muito eu","mds kkk","socorro","isso bateu","cringe mas ok","oi?","wtf"];
+const memes = ["isso é muito eu","mds kkk","socorro","isso bateu","cringe mas ok","oi?","wtf","inacreditável"];
 
-// Função para adicionar mensagem
+// Adiciona mensagem no chat
 function addMessage(text, classe){
   const div = document.createElement("div");
   div.className = "msg " + classe;
@@ -54,36 +54,33 @@ function addMessage(text, classe){
   chat.scrollTop = chat.scrollHeight;
 }
 
-// Função pra pegar personagem aleatório
+// Escolhe personagem aleatório
 function escolherPersonagem() {
   return personagens[Math.floor(Math.random()*personagens.length)];
 }
 
-// Função pra gerar resposta humana infinita
+// Gera resposta humana infinita sem repetir o que o usuário disse
 function gerarResposta(personagem, userText){
-  // guarda no histórico
-  personagem.memoria.push(userText);
+  // guarda contexto geral
+  if(personagem.contexto.length<50) personagem.contexto.push(userText);
 
-  // parte da resposta: aleatório + referencia ao que disse antes
+  // frase base aleatória
   let base = memes[Math.floor(Math.random()*memes.length)];
   let giro = gírias[Math.floor(Math.random()*gírias.length)];
 
-  // referencia aleatória da memória
-  let ref = "";
-  if(personagem.memoria.length>1){
-    const idx = Math.floor(Math.random()*(personagem.memoria.length-1));
-    {personagem.memoria[idx]}"`;
-  }
+  // pequenas variações
+  if(userText.toLowerCase().includes("amo")) base += " 💖";
+  if(userText.toLowerCase().includes("odeio")) base += " 😡";
+  if(userText.includes("?")) base += " 🤔";
 
-  // frase final
-  return `${giro}… ${base}${ref}`;
+  return `${giro}… ${base}`;
 }
 
 // Bot responde
 function botReply(userText){
   const p = escolherPersonagem();
   const resposta = gerarResposta(p, userText);
-  setTimeout(()=>{ addMessage(`${p.nome}: ${resposta}`, "bot"); }, 500 + Math.random()*800);
+  setTimeout(()=>{ addMessage(`${p.nome}: ${resposta}`, "bot"); }, 400 + Math.random()*800);
 }
 
 // Envia mensagem
@@ -95,16 +92,19 @@ function sendMessage(){
   botReply(text);
 }
 
-// Enter envia
+// Enter envia mensagem
 input.addEventListener("keydown", e=>{
-  if(e.key==="Enter") sendMessage();
+  if(e.key==="Enter"){
+    e.preventDefault();
+    sendMessage();
+  }
 });
 
-// mensagem inicial
+// Mensagem inicial
 setTimeout(()=>{
   addMessage("Sistema: pacientes conectados. ninguém aqui é normal… bora conversar.", "system");
 },600);
 </script>
 
 </body>
-  </html>
+ </html>
