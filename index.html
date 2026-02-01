@@ -8,7 +8,7 @@
 <style>
 * {
   box-sizing: border-box;
-  font-family: system-ui, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 body {
@@ -21,73 +21,80 @@ body {
 }
 
 header {
-  padding: 18px;
+  padding: 20px;
   text-align: center;
-  font-size: 1.8rem;
+  font-size: 2.2rem;
+  letter-spacing: 3px;
   border-bottom: 1px solid #222;
-  letter-spacing: 2px;
 }
 
 #chat {
   flex: 1;
-  padding: 20px;
+  padding: 24px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
+/* mensagens */
 .msg {
-  max-width: 85%;
-  padding: 16px 18px;
-  border-radius: 14px;
-  font-size: 1.15rem;
-  line-height: 1.4;
+  max-width: 78%;
+  padding: 18px 22px;
+  border-radius: 18px;
+  font-size: 1.3rem;
+  line-height: 1.45;
+  word-wrap: break-word;
 }
 
 .user {
   align-self: flex-end;
-  background: #1c1c1c;
+  background: #1e1e1e;
   border: 1px solid #333;
 }
 
 .bot {
   align-self: flex-start;
-  background: #0e0e0e;
+  background: #0f0f0f;
   border: 1px solid #2a2a2a;
 }
 
 .system {
   align-self: center;
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: #666;
 }
 
+/* área de envio */
 footer {
   display: flex;
-  gap: 10px;
-  padding: 16px;
+  gap: 12px;
+  padding: 18px;
   border-top: 1px solid #222;
+  background: #050505;
 }
 
-input {
+textarea {
   flex: 1;
-  padding: 16px;
-  font-size: 1.1rem;
+  min-height: 70px;
+  max-height: 160px;
+  resize: vertical;
+  padding: 18px;
+  font-size: 1.3rem;
   background: #0d0d0d;
   color: #fff;
   border: 1px solid #333;
-  border-radius: 12px;
+  border-radius: 14px;
   outline: none;
 }
 
 button {
-  padding: 16px 22px;
-  font-size: 1.1rem;
+  padding: 18px 26px;
+  font-size: 1.2rem;
   background: #7a0000;
   color: #fff;
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
   cursor: pointer;
 }
 button:hover {
@@ -103,7 +110,7 @@ button:hover {
 <div id="chat"></div>
 
 <footer>
-  <input id="input" placeholder="fala qualquer coisa..." />
+  <textarea id="input" placeholder="fala comigo… escreve do jeito que quiser 😈"></textarea>
   <button onclick="sendMessage()">Enviar</button>
 </footer>
 
@@ -114,46 +121,42 @@ const input = document.getElementById("input");
 const personagens = [
   {
     nome: "Seulgi",
-    vibe: "depressão",
     respostas: [
-      "não sei… às vezes tudo soa meio pesado.",
-      "entendi. faz sentido do jeito triste das coisas.",
-      "isso bate diferente dependendo do dia.",
-      "não vou mentir, isso me cansou só de ouvir.",
-      "tem horas que nem responder eu queria."
+      "isso soou pesado… mas eu entendi.",
+      "tem dias que tudo fica assim mesmo.",
+      "não vou fingir que isso não dói.",
+      "te escuto, mesmo cansada.",
+      "fala mais… se quiser."
     ]
   },
   {
     nome: "Yeri",
-    vibe: "paranoia",
     respostas: [
-      "ok, mas por que tu falou isso agora?",
-      "não sei se gostei dessa frase.",
-      "isso parece importante demais pra ser aleatório.",
-      "anota isso mentalmente… só por precaução.",
-      "não tô dizendo nada, só observando."
+      "por que tu falou isso agora?",
+      "isso não parece coincidência.",
+      "anota mentalmente… só por segurança.",
+      "estranho. continua.",
+      "não ignora isso não."
     ]
   },
   {
     nome: "Joy",
-    vibe: "mania",
     respostas: [
-      "KKKKKKKK eu ri, foi mal.",
-      "isso foi inesperado, gostei.",
-      "mds do nada ISSO",
-      "energia caótica, adorei.",
-      "continua, isso tá ficando bom."
+      "KKKKKK mds",
+      "energia caótica, adorei 😭",
+      "eu ri mas foi de nervoso",
+      "isso foi muito do nada",
+      "continua, isso tá bom"
     ]
   },
   {
     nome: "Irene",
-    vibe: "obsessão",
     respostas: [
-      "ok. isso ficou na minha cabeça agora.",
+      "isso ficou preso na minha cabeça agora.",
       "vou pensar nisso mais do que devia.",
       "anotando mentalmente.",
-      "interessante… vou voltar nisso depois.",
-      "não devia importar tanto, mas importa."
+      "não devia importar… mas importa.",
+      "interessante. continua."
     ]
   }
 ];
@@ -166,36 +169,22 @@ function addMessage(text, type) {
   chat.scrollTop = chat.scrollHeight;
 }
 
-function escolherPersonagem() {
-  return personagens[Math.floor(Math.random() * personagens.length)];
-}
-
-function gerarResposta(personagem, userText) {
-  let base = personagem.respostas[
-    Math.floor(Math.random() * personagem.respostas.length)
-  ];
-
-  // respostas mais humanas baseadas no contexto
-  if (userText.length < 4) {
-    base += " fala mais, pô.";
-  } else if (userText.includes("?")) {
-    base += " boa pergunta.";
-  } else if (userText.toLowerCase().includes("odeio")) {
-    base += " dá pra sentir a raiva daí.";
-  } else if (userText.toLowerCase().includes("amo")) {
-    base += " isso foi fofo, infelizmente.";
-  }
-
-  return base;
+function rand(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
 }
 
 function botReply(userText) {
-  const personagem = escolherPersonagem();
-  const resposta = gerarResposta(personagem, userText);
+  const personagem = rand(personagens);
+  let resposta = rand(personagem.respostas);
+
+  if (userText.includes("?")) resposta += " o que tu acha disso?";
+  if (userText.length < 4) resposta += " fala direito pô 😭";
+  if (userText.toLowerCase().includes("amo")) resposta += " isso foi fofo demais.";
+  if (userText.toLowerCase().includes("odeio")) resposta += " deu pra sentir o ódio daqui.";
 
   setTimeout(() => {
     addMessage(`${personagem.nome}: ${resposta}`, "bot");
-  }, 500 + Math.random() * 700);
+  }, 600 + Math.random() * 600);
 }
 
 function sendMessage() {
@@ -209,12 +198,15 @@ function sendMessage() {
 }
 
 input.addEventListener("keydown", e => {
-  if (e.key === "Enter") sendMessage();
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
 });
 
 setTimeout(() => {
   addMessage(
-    "Sistema: paciente conectado. conversa livre. ninguém é normal aqui.",
+    "Sistema: paciente conectado. emojis liberados. ninguém aqui tá são 🖤",
     "system"
   );
 }, 600);
