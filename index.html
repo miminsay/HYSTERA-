@@ -2,32 +2,30 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>HYSTERA 2.0</title>
+<title>HYSTERA</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
-* { box-sizing: border-box; font-family: system-ui, sans-serif; }
-body { margin:0; background:#000; color:#eee; display:flex; flex-direction:column; height:100vh; }
-header { padding:20px; text-align:center; font-size:2.2rem; letter-spacing:3px; border-bottom:1px solid #222; }
-#chat { flex:1; padding:24px; overflow-y:auto; display:flex; flex-direction:column; gap:18px; }
-.msg { max-width:78%; padding:18px 22px; border-radius:18px; font-size:1.3rem; line-height:1.45; word-wrap:break-word; }
-.user { align-self:flex-end; background:#1e1e1e; border:1px solid #333; }
-.bot { align-self:flex-start; background:#0f0f0f; border:1px solid #2a2a2a; }
-.system { align-self:center; font-size:1rem; color:#666; }
-footer { display:flex; gap:12px; padding:18px; border-top:1px solid #222; background:#050505; }
-textarea { flex:1; min-height:70px; max-height:160px; resize:vertical; padding:18px; font-size:1.3rem; background:#0d0d0d; color:#fff; border:1px solid #333; border-radius:14px; outline:none; }
-button { padding:18px 26px; font-size:1.2rem; background:#7a0000; color:#fff; border:none; border-radius:14px; cursor:pointer; }
-button:hover { background:#a00000; }
+  * { box-sizing: border-box; font-family: system-ui, sans-serif; }
+  body { margin:0; background:#000; color:#eee; display:flex; flex-direction:column; height:100vh; }
+  header { padding:18px; text-align:center; font-size:2rem; border-bottom:1px solid #222; letter-spacing:2px; }
+  #chat { flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; }
+  .msg { max-width:80%; padding:14px 18px; border-radius:16px; font-size:1.2rem; line-height:1.4; word-wrap:break-word; }
+  .user { align-self:flex-end; background:#1c1c1c; border:1px solid #333; }
+  .bot { align-self:flex-start; background:#0e0e0e; border:1px solid #2a2a2a; }
+  .system { align-self:center; font-size:1rem; color:#666; }
+  footer { display:flex; gap:10px; padding:16px; border-top:1px solid #222; }
+  input { flex:1; padding:16px; font-size:1.2rem; background:#0d0d0d; color:#fff; border:1px solid #333; border-radius:12px; outline:none; }
+  button { padding:16px 22px; font-size:1.2rem; background:#7a0000; color:#fff; border:none; border-radius:12px; cursor:pointer; }
+  button:hover { background:#a00000; }
 </style>
 </head>
 <body>
 
-<header>HYSTERA 2.0</header>
-
+<header>HYSTERA</header>
 <div id="chat"></div>
 
 <footer>
-  <textarea id="input" placeholder="fala comigo… escreve do jeito que quiser 😈"></textarea>
+  <input id="input" placeholder="fala qualquer coisa..." />
   <button onclick="sendMessage()">Enviar</button>
 </footer>
 
@@ -35,94 +33,77 @@ button:hover { background:#a00000; }
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
 
-// memória infinita
-let memoria = [];
-
-// personagens
+// Divas
 const personagens = [
-  { nome:"Seulgi", vibe:"depressão" },
-  { nome:"Yeri", vibe:"paranoia" },
-  { nome:"Joy", vibe:"mania" },
-  { nome:"Irene", vibe:"obsessão" }
+  { nome: "Seulgi", vibe:"depressão", memoria:[] },
+  { nome: "Yeri", vibe:"paranoia", memoria:[] },
+  { nome: "Joy", vibe:"mania", memoria:[] },
+  { nome: "Irene", vibe:"obsessão", memoria:[] }
 ];
 
-// gírias, emojis e memes
-const extras = ["mano","véi","mds","slc","KKKK","😂","😭","😳","😈","socorro","real","juro","aff","🤡","fofo demais"];
+// Emojis e gírias
+const gírias = ["mano","véi","mds","slc","real","juro","kkk","😭","🤡","😳","😈","😱"];
+const memes = ["isso é muito eu","mds kkk","socorro","isso bateu","cringe mas ok","oi?","wtf"];
 
-// cria frases humanas sem repetir literal
-function gerarResposta(personagem, userText){
-  memoria.push(userText);
-
-  let frase = "";
-
-  // começar com gíria ou emoji aleatório
-  if(Math.random()>0.4) frase += rand(extras)+"… ";
-
-  // gerar frase baseada na vibe
-  switch(personagem.vibe){
-    case "depressão":
-      frase += ["mano… isso pesa","isso bate diferente dependendo do dia","não sei, tudo parece cinza","aff… me identifiquei","tô quieta só ouvindo"].map(rand)[0];
-      break;
-    case "paranoia":
-      frase += ["espera… isso é estranho","tem alguém olhando","isso não parece coincidência","anota mentalmente… só por precaução","tô sentindo algo errado"].map(rand)[0];
-      break;
-    case "mania":
-      frase += ["KKKKKK eu ri","energia caótica demais kkk","isso foi inesperado","continua, gostei demais","mds, adorei o caos"].map(rand)[0];
-      break;
-    case "obsessão":
-      frase += ["isso ficou preso na minha cabeça","vou pensar nisso mais do que devia","interessante… continuo analisando","não devia importar mas importa","ahhh mano, não consigo parar de pensar nisso"].map(rand)[0];
-      break;
-  }
-
-  // referência à memória anterior sem repetir literal
-  if(memoria.length>2){
-    let context = memoria.slice(-3,-1).join(" ");
-    let palavras = context.split(" ").filter(w=>w.length>2);
-    if(palavras.length>0 && Math.random()>0.5){
-      frase += " …isso me lembra de '"+rand(palavras)+"' 😳";
-    }
-  }
-
-  // respostas adaptativas
-  if(userText.includes("?")) frase += " o que tu acha disso?";
-  if(userText.length<4) frase += " fala mais aí 😭";
-  if(userText.toLowerCase().includes("amo")) frase += " isso foi fofo demais 😈";
-  if(userText.toLowerCase().includes("odeio")) frase += " deu pra sentir o ódio kkk";
-
-  return frase;
-}
-
-function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-
-function addMessage(text,type){
-  const div=document.createElement("div");
-  div.className="msg "+type;
-  div.innerText=text;
+// Função para adicionar mensagem
+function addMessage(text, classe){
+  const div = document.createElement("div");
+  div.className = "msg " + classe;
+  div.innerText = text;
   chat.appendChild(div);
-  chat.scrollTop=chat.scrollHeight;
+  chat.scrollTop = chat.scrollHeight;
 }
 
+// Função pra pegar personagem aleatório
+function escolherPersonagem() {
+  return personagens[Math.floor(Math.random()*personagens.length)];
+}
+
+// Função pra gerar resposta humana infinita
+function gerarResposta(personagem, userText){
+  // guarda no histórico
+  personagem.memoria.push(userText);
+
+  // parte da resposta: aleatório + referencia ao que disse antes
+  let base = memes[Math.floor(Math.random()*memes.length)];
+  let giro = gírias[Math.floor(Math.random()*gírias.length)];
+
+  // referencia aleatória da memória
+  let ref = "";
+  if(personagem.memoria.length>1){
+    const idx = Math.floor(Math.random()*(personagem.memoria.length-1));
+    {personagem.memoria[idx]}"`;
+  }
+
+  // frase final
+  return `${giro}… ${base}${ref}`;
+}
+
+// Bot responde
 function botReply(userText){
-  const personagem=rand(personagens);
-  const resposta=gerarResposta(personagem,userText);
-  setTimeout(()=>{ addMessage(`${personagem.nome}: ${resposta}`,"bot"); },500+Math.random()*700);
+  const p = escolherPersonagem();
+  const resposta = gerarResposta(p, userText);
+  setTimeout(()=>{ addMessage(`${p.nome}: ${resposta}`, "bot"); }, 500 + Math.random()*800);
 }
 
+// Envia mensagem
 function sendMessage(){
-  const text=input.value.trim();
+  const text = input.value.trim();
   if(!text) return;
-  addMessage(text,"user");
-  input.value="";
+  addMessage("Você: "+text, "user");
+  input.value = "";
   botReply(text);
 }
 
-input.addEventListener("keydown",e=>{
-  if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); sendMessage(); }
+// Enter envia
+input.addEventListener("keydown", e=>{
+  if(e.key==="Enter") sendMessage();
 });
 
 // mensagem inicial
-setTimeout(()=>{ addMessage("Sistema: paciente conectado. memória infinita ativada. conversa livre. ninguém aqui tá 100% são 🖤","system"); },600);
-
+setTimeout(()=>{
+  addMessage("Sistema: pacientes conectados. ninguém aqui é normal… bora conversar.", "system");
+},600);
 </script>
 
 </body>
