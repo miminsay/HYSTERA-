@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>HYSTERA</title>
+
+<style>
+body{
+  background:#f5f5f5;
+  font-family: monospace;
+  margin:0;
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+}
+
+#title{
+  background:#fff;
+  padding:10px;
+  text-align:center;
+  letter-spacing:4px;
+  font-size:22px;
+}
+
+#chat{
+  flex:1;
+  padding:15px;
+  overflow-y:auto;
+}
+
+.msg{
+  margin-bottom:10px;
+}
+
+.user{
+  color:#000;
+}
+
+.bot{
+  color:#444;
+}
+
+#inputBox{
+  display:flex;
+  border-top:1px solid #ccc;
+}
+
+input{
+  flex:1;
+  padding:10px;
+  border:none;
+  outline:none;
+  font-size:16px;
+}
+
+button{
+  padding:10px;
+  border:none;
+  background:#000;
+  color:#fff;
+}
+.glitch{
+  animation: glitch 0.15s infinite;
+}
+
+@keyframes glitch{
+  0%{transform:translate(0)}
+  25%{transform:translate(-1px,1px)}
+  50%{transform:translate(1px,-1px)}
+  75%{transform:translate(-1px,-1px)}
+}
+</style>
+</head>
+
+<body>
+
+<div id="title">H Y S T E R A</div>
+
+<div id="chat"></div>
+
+<div id="inputBox">
+  <input id="input" placeholder="digite..." />
+  <button id="send">ENVIAR</button>
+</div>
+
+<script>
+// ===== VARIÁVEIS GLOBAIS =====
+let steps = 0;
+let lastUser = "";
+let current = 0;
+
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+const send = document.getElementById("send");
+
+// ===== PERSONAGENS =====
+const girls = [
+  { name:"Joy", role:"Mania" },
+  { name:"Seulgi", role:"Depressão" },
+  { name:"Irene", role:"Obsessão" },
+  { name:"Yeri", role:"Paranoia" }
+];
+
+// ===== FUNÇÕES =====
+function add(text, cls){
+  const div = document.createElement("div");
+  div.className = "msg " + cls;
+  div.innerText = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function rand(max){
+  return Math.floor(Math.random()*max);
+}
+
+function smartReply(userText){
+  const lower = userText.toLowerCase();
+
+  const casual = ["kkk","aham","mds","entendi","ok","sei","talvez"];
+  const human = ["oii","fala","tô aqui","pode falar","te escuto"];
+  const clinical = [
+    "observação registrada.",
+    "resposta anotada.",
+    "padrão recorrente.",
+    "isso já aconteceu antes."
+  ];
+  const paranoia = [
+    "isso não devia aparecer.",
+    "a clínica escutou isso.",
+    "tem algo errado aqui."
+  ];
+
+  let r = "";
+  r += human[rand(human.length)] + " ";
+
+  if(lower.includes("oi")) r += "oi kkk ";
+  if(lower.includes("?")) r += "boa pergunta. ";
+
+  r += casual[rand(casual.length)] + ". ";
+
+  if(steps > 6) r += clinical[rand(clinical.length)];
+  if(steps > 12 && Math.random() > 0.6)
+    r += " " + paranoia[rand(paranoia.length)];
+
+  return r;
+}
+
+function reply(){
+  const g = girls[current];
+  const text = smartReply(lastUser);
+  add(g.name + ": " + text, "bot");
+
+  if(steps > 10) document.body.classList.add("glitch");
+
+  steps++;
+  current = (current + 1) % girls.length;
+}
+
+// ===== EVENTO =====
+send.onclick = () => {
+  if(!input.value) return;
+  lastUser = input.value;
+  add("Você: " + input.value, "user");
+  input.value = "";
+  reply();
+};
+
+// ===== INTRO =====
+add("Sistema: Clínica iniciada.", "bot");
+add("Sistema: Pacientes conectadas.", "bot");
+</script>
+
+</body>
+</html>
