@@ -1,0 +1,72 @@
+let steps = 0;
+let lastUser = "";
+function reply(){
+function reply(){
+  const g = girls[current];
+  const text = smartReply(lastUser);
+  add(`${g.name}: ${text}`, 'bot');
+
+  // aumenta a loucura aos poucos
+  steps++;
+
+  // troca de personagem
+  current = (current + 1) % girls.length;
+}
+
+  const human = [
+    "oii",
+    "fala",
+    "tô aqui",
+    "pode falar",
+    "te escuto",
+    "continua"
+  ];
+
+  const clinical = [
+    "observação registrada.",
+    "resposta anotada.",
+    "comportamento recorrente.",
+    "padrão identificado.",
+    "isso já apareceu antes.",
+    "isso diz algo."
+  ];
+
+  const paranoia = [
+    "essa pergunta não estava no prontuário.",
+    "ninguém devia ler isso.",
+    "isso não era pra aparecer.",
+    "você percebeu também?"
+  ];
+
+  let response = "";
+
+  // Reação básica
+  response += human[rand(human.length)] + " ";
+
+  // Se detectar emoção
+  if(lower.includes("triste") || lower.includes("mal")){
+    response += "sinto isso. ";
+  }
+
+  if(lower.includes("oi") || lower.includes("olá")){
+    response += "kkk oi. ";
+  }
+
+  if(lower.includes("?")){
+    response += "boa pergunta. ";
+  }
+
+  // Casual
+  response += casual[rand(casual.length)] + ". ";
+
+  // Quanto mais avança, mais estranho
+  if(steps > 6){
+    response += clinical[rand(clinical.length)];
+  }
+
+  if(steps > 12 && Math.random() > 0.6){
+    response += " " + paranoia[rand(paranoia.length)];
+  }
+
+  return response;
+}
