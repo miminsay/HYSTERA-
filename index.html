@@ -1,64 +1,124 @@
-<script>
-  const chat = document.getElementById("chat");
-  const input = document.getElementById("input");
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>HYSTERA</title>
 
-  const personagens = [
-    {
-      nome: "Seulgi",
-      respostas: [
-        "mano… tu também sente que tá todo mundo te olhando? KLKKKK",
-        "eu juro que ouvi alguém sussurrando agora, mas deve ser coisa da minha cabeça… eu acho.",
-        "fica tranquilo… ou não fica, sei lá, ninguém fica normal aqui.",
-        "tu fala e eu tento focar, mas minha mente já foi pra outro canto faz tempo.",
-        "às vezes eu paro do nada pq tenho certeza que alguém tá atrás de mim."
-      ]
-    },
-    {
-      nome: "Joy",
-      respostas: [
-        "KKKKKKK eu rio mas é de nervoso tá?",
-        "ninguém aqui é 100% são, isso já ajuda a se sentir menos estranho.",
-        "tu parece menos quebrado do que a maioria daqui, parabéns eu acho?",
-        "me conta mais, fofoca terapêutica é válida.",
-        "se a gente surtar junto fica menos pesado, pensa assim."
-      ]
+  <style>
+    body{
+      background:black;
+      color:white;
+      font-family: monospace;
     }
-  ];
+    .msg{ margin:10px 0; }
+    .user{ color:#fff; }
+    .bot{ color:#aaa; }
+    .system{ color:#666; }
+  </style>
+</head>
 
-  function addMessage(text, className) {
-    const div = document.createElement("div");
-    div.className = "msg " + className;
-    div.innerText = text;
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
+<body>
+
+<div id="chat"></div>
+
+<input id="input" placeholder="digita..." />
+
+<button onclick="sendMessage()">Enviar</button>
+
+
+<script>
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+
+const personagens = [
+  { nome: "Seulgi", vibe: "depressão" },
+  { nome: "Yeri", vibe: "paranoia" },
+  { nome: "Joy", vibe: "mania" }
+  { nome: "Irene", vibe: "obsessão" }
+];
+
+const gírias = [
+  "mano", "véi", "mds", "slc", "real", "juro",
+  "????", "KKKKKK", "rindo de nervoso", "socorro"
+];
+
+const reacoes = {
+  paranoia: [
+    "tu falou isso alto demais.",
+    "tem alguém ouvindo, certeza.",
+    "anota isso não… melhor não.",
+    "isso vai dar ruim, eu sinto.
+    
+  ],
+  mania: [
+    "KKKKK eu ri, foi mal.",
+    "isso foi estranho… gostei.",
+    "tô brincando… ou não.",
+    "me conta mais, fofoca importa."
+  ]
+};
+
+function rand(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function addMessage(text, className) {
+  const div = document.createElement("div");
+  div.className = "msg " + className;
+  div.innerText = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function gerarResposta(personagem, inputUser) {
+  const inicio = rand(gírias);
+  const meio = rand(reacoes[personagem.vibe]);
+
+  let comentario = "";
+  if (inputUser.length < 4) {
+    comentario = "fala direito, carai.";
+  } else if (inputUser.includes("?")) {
+    comentario = "boa pergunta… ou não.";
+  } else {
+    comentario = "isso diz muito sobre você.";
   }
 
-  function botReply() {
-    const personagem = personagens[Math.floor(Math.random() * personagens.length)];
-    const resposta = personagem.respostas[
-      Math.floor(Math.random() * personagem.respostas.length)
-    ];
+  return `${inicio}… ${meio} ${comentario}`;
+}
 
-    setTimeout(() => {
-      addMessage(`${personagem.nome}: ${resposta}`, "bot");
-    }, 600);
-  }
-
-  function sendMessage() {
-    const text = input.value.trim();
-    if (!text) return;
-
-    addMessage(text, "user");
-    input.value = "";
-
-    botReply();
-  }
-
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") sendMessage();
-  });
+function botReply(userText) {
+  const personagem = rand(personagens);
+  const resposta = gerarResposta(personagem, userText);
 
   setTimeout(() => {
-    addMessage("Sistema: paciente conectado… boa sorte lidando com isso.", "bot");
-  }, 500);
-                                        </script>
+    addMessage(`${personagem.nome}: ${resposta}`, "bot");
+  }, 500 + Math.random() * 700);
+}
+
+function sendMessage() {
+  const text = input.value.trim();
+  if (!text) return;
+
+  addMessage(text, "user");
+  input.value = "";
+
+  botReply(text);
+}
+
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter") sendMessage();
+});
+
+// mensagem inicial
+setTimeout(() => {
+  addMessage(
+    "Sistema: paciente conectado. ninguém aqui tá 100% bem, relaxa.",
+    "bot"
+  );
+}, 600);
+  </script>
+  
+</script>
+
+</body>
+</html>
