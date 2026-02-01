@@ -1,124 +1,209 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>HYSTERA</title>
+<meta charset="UTF-8">
+<title>HYSTERA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    body{
-      background:black;
-      color:white;
-      font-family: monospace;
-    }
-    .msg{ margin:10px 0; }
-    .user{ color:#fff; }
-    .bot{ color:#aaa; }
-    .system{ color:#666; }
-  </style>
+<style>
+*{
+  box-sizing: border-box;
+  font-family: monospace;
+}
+
+body{
+  margin:0;
+  background:black;
+  color:white;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+header{
+  padding:16px;
+  text-align:center;
+  font-size:1.6rem;
+  border-bottom:1px solid #222;
+}
+
+#chat{
+  flex:1;
+  padding:20px;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  font-size:1.15rem;
+}
+
+.msg{
+  max-width:85%;
+  padding:14px 18px;
+  border-radius:12px;
+}
+
+.user{
+  align-self:flex-end;
+  background:#111;
+  border:1px solid #333;
+}
+
+.bot{
+  align-self:flex-start;
+  background:#050505;
+  border:1px solid #222;
+  color:#bbb;
+}
+
+.system{
+  align-self:center;
+  font-size:0.9rem;
+  color:#666;
+}
+
+footer{
+  display:flex;
+  gap:10px;
+  padding:16px;
+  border-top:1px solid #222;
+}
+
+input{
+  flex:1;
+  padding:16px;
+  font-size:1.1rem;
+  background:#0a0a0a;
+  border:1px solid #333;
+  color:white;
+  border-radius:10px;
+  outline:none;
+}
+
+button{
+  padding:16px 22px;
+  font-size:1.1rem;
+  background:#8b0000;
+  border:none;
+  color:white;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#b00000;
+}
+</style>
 </head>
 
 <body>
 
+<header>HYSTERA</header>
+
 <div id="chat"></div>
 
-<input id="input" placeholder="digita..." />
-
-<button onclick="sendMessage()">Enviar</button>
-
+<footer>
+  <input id="input" placeholder="fala alguma coisa…" />
+  <button onclick="sendMessage()">Enviar</button>
+</footer>
 
 <script>
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
 
 const personagens = [
-  { nome: "Seulgi", vibe: "depressão" },
+  { nome: "Seulgi", vibe: "depressao" },
   { nome: "Yeri", vibe: "paranoia" },
-  { nome: "Joy", vibe: "mania" }
-  { nome: "Irene", vibe: "obsessão" }
+  { nome: "Joy", vibe: "mania" },
+  { nome: "Irene", vibe: "obsessao" }
 ];
 
-const gírias = [
-  "mano", "véi", "mds", "slc", "real", "juro",
-  "????", "KKKKKK", "rindo de nervoso", "socorro"
+const girias = [
+  "mano", "véi", "mds", "real", "juro",
+  "KKKKKK", "????", "rindo de nervoso", "socorro"
 ];
 
 const reacoes = {
+  depressao: [
+    "isso pesa, não vou mentir.",
+    "cansa até explicar.",
+    "não é drama não.",
+    "fica aí, fala mais."
+  ],
   paranoia: [
     "tu falou isso alto demais.",
-    "tem alguém ouvindo, certeza.",
-    "anota isso não… melhor não.",
-    "isso vai dar ruim, eu sinto.
-    
+    "tem alguém ouvindo.",
+    "isso não parece coincidência.",
+    "isso vai dar ruim, eu sinto."
   ],
   mania: [
-    "KKKKK eu ri, foi mal.",
-    "isso foi estranho… gostei.",
-    "tô brincando… ou não.",
-    "me conta mais, fofoca importa."
+    "KKKK eu ri foi mal.",
+    "isso deu uma ideia agora.",
+    "tô acelerada demais.",
+    "me conta mais, rápido."
+  ],
+  obsessao: [
+    "volta nisso, tem detalhe faltando.",
+    "isso não tá bem explicado.",
+    "organiza melhor esse pensamento.",
+    "repete isso direito."
   ]
 };
 
-function rand(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
+function rand(arr){
+  return arr[Math.floor(Math.random()*arr.length)];
 }
 
-function addMessage(text, className) {
+function addMessage(text, type){
   const div = document.createElement("div");
-  div.className = "msg " + className;
+  div.className = "msg " + type;
   div.innerText = text;
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
 }
 
-function gerarResposta(personagem, inputUser) {
-  const inicio = rand(gírias);
-  const meio = rand(reacoes[personagem.vibe]);
+function gerarResposta(p, userText){
+  const inicio = rand(girias);
+  const meio = rand(reacoes[p.vibe]);
 
-  let comentario = "";
-  if (inputUser.length < 4) {
-    comentario = "fala direito, carai.";
-  } else if (inputUser.includes("?")) {
-    comentario = "boa pergunta… ou não.";
+  let final = "";
+  if(userText.length < 4){
+    final = "fala direito, carai.";
+  } else if(userText.includes("?")){
+    final = "boa pergunta… ou não.";
   } else {
-    comentario = "isso diz muito sobre você.";
+    final = "isso diz muita coisa.";
   }
 
-  return `${inicio}… ${meio} ${comentario}`;
+  return `${inicio}… ${meio} ${final}`;
 }
 
-function botReply(userText) {
-  const personagem = rand(personagens);
-  const resposta = gerarResposta(personagem, userText);
+function botReply(userText){
+  const p = rand(personagens);
+  const resposta = gerarResposta(p, userText);
 
-  setTimeout(() => {
-    addMessage(`${personagem.nome}: ${resposta}`, "bot");
-  }, 500 + Math.random() * 700);
+  setTimeout(()=>{
+    addMessage(`${p.nome}: ${resposta}`, "bot");
+  }, 400 + Math.random()*600);
 }
 
-function sendMessage() {
+function sendMessage(){
   const text = input.value.trim();
-  if (!text) return;
+  if(!text) return;
 
-  addMessage(text, "user");
+  addMessage("Você: " + text, "user");
   input.value = "";
-
   botReply(text);
 }
 
-input.addEventListener("keydown", e => {
-  if (e.key === "Enter") sendMessage();
+input.addEventListener("keydown", e=>{
+  if(e.key === "Enter") sendMessage();
 });
 
-// mensagem inicial
-setTimeout(() => {
-  addMessage(
-    "Sistema: paciente conectado. ninguém aqui tá 100% bem, relaxa.",
-    "bot"
-  );
+setTimeout(()=>{
+  addMessage("Sistema: paciente conectado. ninguém aqui tá normal.", "system");
 }, 600);
-  </script>
-  
 </script>
 
 </body>
-</html>
+  </html>
