@@ -1,0 +1,157 @@
+<script>
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+
+const base = {
+  conectores: [
+    "tipo", "real", "na moral", "então", "assim",
+    "sei lá", "falando sério", "papo reto",
+    "não vou mentir", "vou ser sincera"
+  ],
+  reacoes: [
+    "entendi o que tu quis dizer",
+    "peguei a visão",
+    "isso faz sentido",
+    "isso bateu diferente",
+    "deu pra sentir daqui",
+    "isso não veio do nada",
+    "isso explica muita coisa",
+    "isso ficou na cabeça né"
+  ],
+  perguntas: [
+    "o que tu sentiu nisso?",
+    "isso te afetou mais do que tu esperava?",
+    "isso ficou martelando depois?",
+    "tu costuma pensar nisso sempre?",
+    "quer continuar falando?"
+  ],
+  memes: [
+    "eu rindo mas por dentro 🤡",
+    "não é surto, é vivência",
+    "mente indo de base",
+    "era dentro infelizmente",
+    "se não rir a gente chora",
+    "isso foi muito floptok"
+  ]
+};
+
+const personagens = [
+  {
+    nome: "Seulgi",
+    estilo(text){
+      return montarResposta({
+        pergunta: true,
+        memeChance: 0.05
+      });
+    }
+  },
+  {
+    nome: "Joy",
+    estilo(text){
+      return montarResposta({
+        pergunta: false,
+        memeChance: 0.4
+      });
+    }
+  },
+  {
+    nome: "Irene",
+    estilo(text){
+      return montarResposta({
+        pergunta: false,
+        memeChance: 0
+      });
+    }
+  },
+  {
+    nome: "Yeri",
+    estilo(text){
+      return montarResposta({
+        pergunta: true,
+        memeChance: 0.15
+      });
+    }
+  }
+];
+
+function rand(arr){
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function montarResposta(opts){
+  let frase = "";
+
+  if(Math.random() < 0.8){
+    frase += rand(base.conectores) + ", ";
+  }
+
+  frase += rand(base.reacoes);
+
+  if(opts.pergunta && Math.random() < 0.6){
+    frase += ". " + rand(base.perguntas);
+  }
+
+  if(Math.random() < opts.memeChance){
+    frase += " — " + rand(base.memes);
+  }
+
+  return frase;
+}
+
+function addMessage(text, className){
+  const div = document.createElement("div");
+  div.className = "msg " + className;
+  div.innerText = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function analisarTom(text){
+  if(text.match(/kkk|lol|mds|aff|haha/i)) return "leve";
+  if(text.length > 90) return "pesado";
+  if(text.includes("?")) return "reflexivo";
+  return "normal";
+}
+
+function botReply(userText){
+  const tom = analisarTom(userText);
+
+  let pool = personagens;
+
+  if(tom === "pesado"){
+    pool = personagens.filter(p => p.nome !== "Joy");
+  }
+
+  const p = pool[Math.floor(Math.random() * pool.length)];
+  let resposta = p.estilo(userText);
+
+  if(tom === "reflexivo"){
+    resposta += " o que tu acha disso agora?";
+  }
+
+  setTimeout(()=>{
+    addMessage(`${p.nome}: ${resposta}`, "bot");
+  }, 500 + Math.random()*800);
+}
+
+function sendMessage(){
+  const text = input.value.trim();
+  if(!text) return;
+
+  addMessage("Você: " + text, "user");
+  input.value = "";
+
+  botReply(text);
+}
+
+input.addEventListener("keydown", e=>{
+  if(e.key === "Enter") sendMessage();
+});
+
+setTimeout(()=>{
+  addMessage(
+    "Sistema: chat ativo. ninguém aqui vai te ignorar.",
+    "system"
+  );
+}, 700);
+</script>
